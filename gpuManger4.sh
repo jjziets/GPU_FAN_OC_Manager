@@ -18,7 +18,7 @@
 
 #####   Configurable Settings   #####                                    {{{1
 #OC settings
-MemoryOC=3200 #memory c
+MemoryOC=2700 #memory c
 CoreClockLimit=1250 #core limits
 GPU_OC=0
 
@@ -97,7 +97,7 @@ initFCS()
 
     for i in ${FanControlStates[@]}; do
         if [ $i -eq 0 ]; then
-            xinit   ${SET} -a "GPUFanControlState=1" --  :0 -once > /dev/null 2>&1
+            xinit   ${SET} -a "GPUFanControlState=1"  -a "[gpu:$i]/GPUFanControlState=1"--  :0 -once > /dev/null 2>&1
             echo "Fan Control State Enabled"
             break
         fi
@@ -114,10 +114,10 @@ GpuOC_profile()
         then
 	if [[ $GPU_OC -eq 0 ]]; then
 		let GPU_OC=1 
-		xinit  ${SET} 	-a [gpu:0]/GPUPowerMizerMode=1 -a [gpu:0]/GPUMemoryTransferRateOffsetAllPerformanceLevels=$MemoryOC -a [fan:0]/GPUTargetFanSpeed=100 \
-				-a [gpu:1]/GPUPowerMizerMode=1 -a [gpu:1]/GPUMemoryTransferRateOffsetAllPerformanceLevels=$MemoryOC -a [fan:1]/GPUTargetFanSpeed=100 \
-                                -a [gpu:2]/GPUPowerMizerMode=1 -a [gpu:2]/GPUMemoryTransferRateOffsetAllPerformanceLevels=$MemoryOC -a [fan:2]/GPUTargetFanSpeed=100 \
-                                -a [gpu:3]/GPUPowerMizerMode=1 -a [gpu:3]/GPUMemoryTransferRateOffsetAllPerformanceLevels=$MemoryOC -a [fan:3]/GPUTargetFanSpeed=100 --  :0 -once
+		xinit  ${SET}   -a [gpu:0]/GPUFanControlState=1 -a [gpu:0]/GPUPowerMizerMode=1 -a [gpu:0]/GPUMemoryTransferRateOffsetAllPerformanceLevels=$MemoryOC -a [fan:0]/GPUTargetFanSpeed=100 \
+				-a [gpu:1]/GPUFanControlState=1 -a [gpu:1]/GPUPowerMizerMode=1 -a [gpu:1]/GPUMemoryTransferRateOffsetAllPerformanceLevels=$MemoryOC -a [fan:1]/GPUTargetFanSpeed=100 \
+                                -a [gpu:2]/GPUFanControlState=1 -a [gpu:2]/GPUPowerMizerMode=1 -a [gpu:2]/GPUMemoryTransferRateOffsetAllPerformanceLevels=$MemoryOC -a [fan:2]/GPUTargetFanSpeed=100 \
+                                -a [gpu:3]/GPUFanControlState=1 -a [gpu:3]/GPUPowerMizerMode=1 -a [gpu:3]/GPUMemoryTransferRateOffsetAllPerformanceLevels=$MemoryOC -a [fan:3]/GPUTargetFanSpeed=100 --  :0 -once
 		nvidia-smi --lock-gpu-clocks=$CoreClockLimit
 	fi
      else
@@ -188,7 +188,7 @@ runCurve()
     done
 
         if [[ "${currentSpeed[2]}" != "${Fspeed[2]}" ]]; then
-			xinit ${SET}  -a [fan:0]/GPUTargetFanSpeed=${Fspeed[2]} --  :0 -once
+			xinit ${SET}   -a [fan:0]/GPUTargetFanSpeed=${Fspeed[2]} --  :0 -once
 			echo "GPU0 current ${currentSpeed[2]} and new speed ${Fspeed[2]}"
 	fi
 	if [[ "${currentSpeed[3]}" != "${Fspeed[3]}" ]]; then
