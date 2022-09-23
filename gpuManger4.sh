@@ -188,19 +188,19 @@ runCurve()
     done
 
         if [[ "${currentSpeed[2]}" != "${Fspeed[2]}" ]]; then
-			xinit ${SET}   -a [fan:0]/GPUTargetFanSpeed=${Fspeed[2]} --  :0 -once
+			xinit ${SET}    -a [gpu:0]/GPUFanControlState=1    -a [fan:0]/GPUTargetFanSpeed=${Fspeed[2]} --  :0 -once
 			echo "GPU0 current ${currentSpeed[2]} and new speed ${Fspeed[2]}"
 	fi
 	if [[ "${currentSpeed[3]}" != "${Fspeed[3]}" ]]; then
-			xinit ${SET}  -a [fan:1]/GPUTargetFanSpeed=${Fspeed[3]} --  :0 -once
+			xinit ${SET}      -a [gpu:1]/GPUFanControlState=1  -a [fan:1]/GPUTargetFanSpeed=${Fspeed[3]} --  :0 -once
                		echo "GPU1 current ${currentSpeed[3]} and new speed ${Fspeed[3]}"
 	fi
 	if [[ "${currentSpeed[0]}" != "${Fspeed[0]}" ]]; then
-			xinit ${SET}  -a [fan:2]/GPUTargetFanSpeed=${Fspeed[0]} --  :0 -once
+			xinit ${SET}    -a [gpu:2]/GPUFanControlState=1  -a [fan:2]/GPUTargetFanSpeed=${Fspeed[0]} --  :0 -once
                 	echo "GPU2 current ${currentSpeed[0]} and new speed ${Fspeed[0]}"
 	fi
 	if [[ "${currentSpeed[1]}" != "${Fspeed[1]}" ]]; then
-			xinit ${SET}  -a [fan:3]/GPUTargetFanSpeed=${Fspeed[1]} --  :0 -once
+			xinit ${SET}     -a [gpu:3]/GPUFanControlState=1  -a [fan:3]/GPUTargetFanSpeed=${Fspeed[1]} --  :0 -once
                		echo "GPU3 current ${currentSpeed[1]} and new speed ${Fspeed[1]}"
 	fi
 
