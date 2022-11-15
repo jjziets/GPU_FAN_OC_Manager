@@ -150,11 +150,13 @@ mapFanIndex()
 			#echo "Fans Speed ${currentSpeed[$i]}"
 			if [ ${currentSpeed[$i]} -lt 95 ]; then
 				gpuFanIndex[$n]=$i
-				echo "Fan $i mapped to GPU $n" 
 			fi
 		done #end of i
 		xinit  ${SET} -a [fan:$n]/GPUTargetFanSpeed=100 --  :0 -once
 	done 
+	for i in $(seq 0 $((numGPUs-1))); do
+		echo "GPU $1 $gpuFanIndex[$i]"
+	done #end of i
 
 }
 
