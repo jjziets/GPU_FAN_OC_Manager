@@ -148,14 +148,14 @@ mapFanIndex()
                 currentSpeed=($(nvidia-smi --query-gpu=fan.speed --format=csv,noheader | awk '{print $1}'))
 		for i in $(seq 0 $((numGPUs-1))); do
 			#echo "Fans Speed ${currentSpeed[$i]}"
-			if [ ${currentSpeed[$i]} -lt 95 ]; then
+			if [ ${currentSpeed[$i]} -lt 90 ]; then
 				gpuFanIndex[$n]=$i
 			fi
 		done #end of i
 		xinit  ${SET} -a [fan:$n]/GPUTargetFanSpeed=100 --  :0 -once
 	done 
 	for i in $(seq 0 $((numGPUs-1))); do
-		echo "GPU $1 $gpuFanIndex[$i]"
+		echo "GPU $i set to FAN ${gpuFanIndex[$i]}"
 	done #end of i
 
 }
@@ -323,12 +323,7 @@ case "$1" in
         initFCS
         # Run while configuration is set to pcurve
 	mapFanIndex
-        echo "gpuFanIndex 0 fan ${gpuFanIndex[0]}"
-        echo "gpuFanIndex 1 fan ${gpuFanIndex[1]}"
-        echo "gpuFanIndex 2 fan ${gpuFanIndex[2]}"
-        echo "gpuFanIndex 3 fan ${gpuFanIndex[3]}"
-	sleep 10
-	while [ "$(cat $fanConfig)" == "pcurve" ]; do
+      	while [ "$(cat $fanConfig)" == "pcurve" ]; do
            runCurve 
            sleep $refresh
         done
