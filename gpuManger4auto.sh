@@ -74,14 +74,12 @@ dCurve[5]=30  nCurve[5]=30
 # Export Display (For Headless Use)                                      {{{1
 echo "Start a new X server"
 
-if pgrep -x "Xorg"  > /dev/null
-        then
-	pkill Xorg
-	export DISPLAY=':0'
-	else
-#	X :0 &
-	export DISPLAY=':0'
-fi
+pkill Xorg
+sudo pkill X
+sleep 15
+sudo rm /tmp/.X0-lock
+export DISPLAY=':0'
+
 
 # Paths to the utilities we will need
 SMI='/usr/bin/nvidia-smi'
