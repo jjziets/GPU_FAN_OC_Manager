@@ -88,7 +88,7 @@ This will generate an executable named `set_fan_speed` which you can run as ment
 This program directly manipulates the GPU's fan speed, which can potentially harm your hardware if not used properly. Be careful when choosing a fan speed, especially when setting a low speed for a high-performance GPU under load. It's highly recommended to understand the program's workings before running it, and use it at your own risk.
 
 
-#Bash script that are based on nvidia-fan-control-linux
+# Bash script that are based on nvidia-fan-control-linux
 gpuManger4auto.sh
 gpuManger8auto.sh
 
@@ -97,7 +97,7 @@ This file has be desinged to work on a system that has NVlink pairs. thefore you
 
 This manager will oc the gpu of t-rex is running on that gpu.
 
-#Before running insall the following 
+## Before running insall the following 
 ``` 
 bash -c 'sudo apt-get update; sudo apt-get -y upgrade; sudo apt-get install -y libgtk-3-0; sudo apt-get install -y xinit; sudo apt-get install -y xserver-xorg-core; sudo apt-get remove -y gnome-shell; sudo update-grub; sudo nvidia-xconfig -a --cool-bits=28 --allow-empty-initial-configuration --enable-all-gpus; wget https://raw.githubusercontent.com/jjziets/GPU_FAN_OC_Manager/main/gpuManger4auto.sh, chmod +x gpuManger4auto.sh, 
 (crontab -l; echo "@reboot screen -dmS gpuManger /home/dafit/gpuManger4auto.sh pcurve") | crontab -'
