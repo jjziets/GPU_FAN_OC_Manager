@@ -3,12 +3,10 @@ Here is a set of tools that can be used to manage the fans on a ubunut 20.04 sys
 
 How to run  set_fan_curve with a 65c target. it also updated the corntab so that it runs at boot
 ```
-wget https://github.com/jjziets/GPU_FAN_OC_Manager/raw/main/set_fan_curve
-chmod +x set_fan_curve
-nohup bash -c "while true; do /home/user/set_fan_curve 65; sleep 1; done" > output.txt &
-(crontab -l; echo '@reboot screen -dmS gpuManger bash -c "while true; do /home/user/set_fan_curve 65; sleep 1; done"') | crontab -'
+bash -c "wget https://github.com/jjziets/GPU_FAN_OC_Manager/raw/main/set_fan_curve; chmod +x set_fan_curve; cd $(pwd); nohup bash -c 'while true; do $(pwd)/set_fan_curve 65; sleep 1; done' > output.txt &; (crontab -l; echo '@reboot screen -dmS gpuManger bash -c \"while true; do $(pwd)/set_fan_curve 65; sleep 1; done\"') | crontab -"
+
 ```
-Replace the path /home/user/ to the user on Ubuntu. 
+
 
 
 # set_fan_curve.cpp
