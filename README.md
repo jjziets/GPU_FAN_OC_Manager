@@ -21,7 +21,7 @@ Here's the detailed explanation of the script:
    This command changes the current directory to the directory from where the script is run. `$(pwd)` returns the current directory.
 
 4. `nohup bash -c 'while true; do $(pwd)/set_fan_curve 65; sleep 1; done' > output.txt &;`: 
-   This command starts an infinite loop that runs the `set_fan_curve` script every second. The output is redirected to `output.txt` and the process is backgrounded (`&`). The `nohup` command makes the loop continue to run even if the terminal session is closed.
+   This command starts an infinite loop that runs the `set_fan_curve`. If set_fan_curve exits it will restart it with a second delay. The output is redirected to `output.txt` and the process is backgrounded (`&`). The `nohup` command makes the loop continue to run even if the terminal session is closed.
 
 5. `(crontab -l; echo '@reboot screen -dmS gpuManger bash -c \"while true; do $(pwd)/set_fan_curve 65; sleep 1; done\"') | crontab -`: 
    This command modifies the current user's crontab to include a new job that will run on system startup (`@reboot`). The job runs a `screen` session named `gpuManger` that starts the same infinite loop as above. This ensures that the fan control script will start running again after each system reboot.
