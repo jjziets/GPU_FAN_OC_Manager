@@ -1,11 +1,33 @@
 # GPU_FAN_OC_Manager
 Here is a set of tools that can be used to manage the fans on a ubunut 20.04 system with cuda 12.
 
-How to run  set_fan_curve with a 65c target. it also updated the corntab so that it runs at boot
+This script is designed to manage the fan speed of your GPU. It does this by periodically running a script called `set_fan_curve` which adjusts the fan speed based on the given parameter (in this case, `65`) which is 65c target.
+
+
 ```
 bash -c "wget https://github.com/jjziets/GPU_FAN_OC_Manager/raw/main/set_fan_curve; chmod +x set_fan_curve; cd $(pwd); nohup bash -c 'while true; do $(pwd)/set_fan_curve 65; sleep 1; done' > output.txt &; (crontab -l; echo '@reboot screen -dmS gpuManger bash -c \"while true; do $(pwd)/set_fan_curve 65; sleep 1; done\"') | crontab -"
 
 ```
+
+Here's the detailed explanation of the script:
+
+1. `wget https://github.com/jjziets/GPU_FAN_OC_Manager/raw/main/set_fan_curve;`: 
+   This command fetches the `set_fan_curve` script from a GitHub repository.
+
+2. `chmod +x set_fan_curve;`: 
+   This command changes the permissions of the `set_fan_curve` script to make it executable.
+
+3. `cd $(pwd);`: 
+   This command changes the current directory to the directory from where the script is run. `$(pwd)` returns the current directory.
+
+4. `nohup bash -c 'while true; do $(pwd)/set_fan_curve 65; sleep 1; done' > output.txt &;`: 
+   This command starts an infinite loop that runs the `set_fan_curve` script every second. The output is redirected to `output.txt` and the process is backgrounded (`&`). The `nohup` command makes the loop continue to run even if the terminal session is closed.
+
+5. `(crontab -l; echo '@reboot screen -dmS gpuManger bash -c \"while true; do $(pwd)/set_fan_curve 65; sleep 1; done\"') | crontab -`: 
+   This command modifies the current user's crontab to include a new job that will run on system startup (`@reboot`). The job runs a `screen` session named `gpuManger` that starts the same infinite loop as above. This ensures that the fan control script will start running again after each system reboot.
+
+This script is useful if you want to automate the management of your GPU fan speed. Remember that running the script will replace the existing fan curve, so use it carefully and make sure to test it in a controlled environment first.
+
 
 
 
