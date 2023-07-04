@@ -1,7 +1,7 @@
 # GPU_FAN_OC_Manager
 Here is a set of tools that can be used to manage the fans on a ubunut 20.04 system with cuda 12.
 
-This script is designed to manage the fan speed of your GPU. It does this by periodically running a script called `set_fan_curve` which adjusts the fan speed based on the given parameter (in this case, `65`) which is 65c target.
+This script is designed to manage the fan speed of your nvidia GPUs. It does this by periodically running a script called `set_fan_curve` which adjusts the fan speed based on the given parameter (in this case, `65`) which is 65c target.
 
 
 ```
