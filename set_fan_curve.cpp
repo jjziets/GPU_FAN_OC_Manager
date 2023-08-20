@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
 
             // Get number of fans
             unsigned int fanCount;
-            result = nvmlDeviceGetFanSpeedCount(device, &fanCount);
+            result = nvmlDeviceGetFanCount(device, &fanCount);
             if (NVML_SUCCESS != result) {
                 std::cerr << "Failed to get fan count for device " << i << ": " << nvmlErrorString(result) << std::endl;
                 continue;
