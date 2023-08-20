@@ -7,7 +7,6 @@
 #define MAX_FAN_SPEED 100
 #define AUTO_FAN_SPEED 0
 
-// Function to get the appropriate fan speed based on current GPU temperature
 unsigned int getFanSpeed(int current_temp, int max_temp) {
     int difference = max_temp - current_temp;
     if (difference >= 40) return AUTO_FAN_SPEED;
@@ -64,29 +63,38 @@ int main(int argc, char *argv[]) {
                 continue;
             }
 
-            // Get current fan speed
-            unsigned int currentFanSpeed;
-            result = nvmlDeviceGetFanSpeed_v2(device, i, &currentFanSpeed); // Assuming fan index 0
+            // Get number of fans
+            unsigned int fanCount;
+            result = nvmlDeviceGetFanSpeedCount(device, &fanCount);
             if (NVML_SUCCESS != result) {
-                std::cerr << "Failed to get fan speed for device " << i << ": " << nvmlErrorString(result) << std::endl;
+                std::cerr << "Failed to get fan count for device " << i << ": " << nvmlErrorString(result) << std::endl;
                 continue;
             }
 
-            // Get desired fan speed based on temperature
-            unsigned int fanSpeed = getFanSpeed(temp, max_temp);
-
-            // Only set the fan speed if it's different from the current speed
-            if (fanSpeed != currentFanSpeed) {
-                result = nvmlDeviceSetFanSpeed_v2(device, i, fanSpeed); // Assuming fan index 0
+            for (unsigned int fanIdx = 0; fanIdx < fanCount; fanIdx++) {
+                // Get current fan speed
+                unsigned int currentFanSpeed;
+                result = nvmlDeviceGetFanSpeed_v2(device, fanIdx, &currentFanSpeed);
                 if (NVML_SUCCESS != result) {
-                    std::cerr << "Failed to set fan speed for device " << i << ": " << nvmlErrorString(result) << std::endl;
-                } else {
-                   // std::cout << "Set fan speed for device " << i << " to " << fanSpeed << "%" << std::endl;
+                    std::cerr << "Failed to get fan speed for device " << i << " fan " << fanIdx << ": " << nvmlErrorString(result) << std::endl;
+                    continue;
+                }
+
+                // Get desired fan speed based on temperature
+                unsigned int fanSpeed = getFanSpeed(temp, max_temp);
+
+                // Only set the fan speed if it's different from the current speed
+                if (fanSpeed != currentFanSpeed) {
+                    result = nvmlDeviceSetFanSpeed_v2(device, fanIdx, fanSpeed);
+                    if (NVML_SUCCESS != result) {
+                        std::cerr << "Failed to set fan speed for device " << i << " fan " << fanIdx << ": " << nvmlErrorString(result) << std::endl;
+                    } else {
+                       // std::cout << "Set fan speed for device " << i << " fan " << fanIdx << " to " << fanSpeed << "%" << std::endl;
+                    }
                 }
             }
         }
 
-        // Sleep for 1 second
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
