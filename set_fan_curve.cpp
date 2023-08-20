@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
 
             // Get current fan speed
             unsigned int currentFanSpeed;
-            result = nvmlDeviceGetFanSpeed_v2(device, 0, &currentFanSpeed); // Assuming fan index 0
+            result = nvmlDeviceGetFanSpeed_v2(device, i, &currentFanSpeed); // Assuming fan index 0
             if (NVML_SUCCESS != result) {
                 std::cerr << "Failed to get fan speed for device " << i << ": " << nvmlErrorString(result) << std::endl;
                 continue;
@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
 
             // Only set the fan speed if it's different from the current speed
             if (fanSpeed != currentFanSpeed) {
-                result = nvmlDeviceSetFanSpeed_v2(device, 0, fanSpeed); // Assuming fan index 0
+                result = nvmlDeviceSetFanSpeed_v2(device, i, fanSpeed); // Assuming fan index 0
                 if (NVML_SUCCESS != result) {
                     std::cerr << "Failed to set fan speed for device " << i << ": " << nvmlErrorString(result) << std::endl;
                 } else {
