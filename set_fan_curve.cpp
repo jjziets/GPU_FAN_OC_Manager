@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
                     if (NVML_SUCCESS != result) {
                         std::cerr << "Failed to set fan speed for device " << i << " fan " << fanIdx << ": " << nvmlErrorString(result) << std::endl;
                     } else {
-                        std::cout << "Set fan speed for device " << i << " fan " << fanIdx << " to " << fanSpeed << "%" << std::endl;
+                       // std::cout << "Set fan speed for device " << i << " fan " << fanIdx << " to " << fanSpeed << "%" << std::endl;
                     }
                 }
             }
