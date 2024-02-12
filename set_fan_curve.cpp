@@ -4,14 +4,7 @@
 #include <csignal>
 #include <thread>
 #include <chrono>
-#include <algorithm>
-#include <fstream>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/mman.h>
 
-#define HOTSPOT_REGISTER_OFFSET 0x0002046c
-#define PAGE_SIZE sysconf(_SC_PAGE_SIZE)
 
 #define MAX_FAN_SPEED 100
 #define AUTO_FAN_SPEED 0
@@ -19,8 +12,6 @@
 // Forward declarations
 void resetFansToAuto();
 void signalHandler(int signum);
-unsigned int getMaxTemperature(nvmlDevice_t device);
-unsigned int readHotSpotTemperature(nvmlDevice_t device);
 
 unsigned int getFanSpeed(int current_temp, int max_temp) {
     int difference = max_temp - current_temp;
@@ -73,13 +64,7 @@ int main(int argc, char *argv[]) {
 
     while (!gracefulShutdown) {
         for (i = 0; i < device_count; i++) {
-            if (system("clear") != 0) {
-                // Handle the error case or log it
-                std::cerr << "Failed to clear screen." << std::endl;
-            }
-
             nvmlDevice_t device;
-
             result = nvmlDeviceGetHandleByIndex(i, &device);
             if (NVML_SUCCESS != result) {
                 std::cerr << "Failed to get handle for device " << i << ": " << nvmlErrorString(result) << std::endl;
@@ -87,7 +72,11 @@ int main(int argc, char *argv[]) {
             }
 
             unsigned int temp;
-            temp = getMaxTemperature(device);
+            result = nvmlDeviceGetTemperature(device, NVML_TEMPERATURE_GPU, &temp);
+            if (NVML_SUCCESS != result) {
+                std::cerr << "Failed to get temperature for device " << i << ": " << nvmlErrorString(result) << std::endl;
+                continue;
+            }
 
             // Get number of fans
             unsigned int fanCount;
@@ -96,6 +85,12 @@ int main(int argc, char *argv[]) {
                 std::cerr << "Failed to get fan count for device " << i << ": " << nvmlErrorString(result) << std::endl;
                 continue;
             }
+
+	    if (system("clear") != 0) {
+    		// Handle the error case or log it
+    		std::cerr << "Failed to clear screen." << std::endl;
+	    }
+
 
            for (unsigned int fanIdx = 0; fanIdx < fanCount; fanIdx++) {
                 // Get current fan speed
@@ -160,79 +155,4 @@ void signalHandler(int signum) {
 
     // Terminate program
     exit(signum);
-}
-
-// Initialize NVML and obtain device handle before calling this function
-unsigned int getMaxTemperature(nvmlDevice_t device) {
-    nvmlReturn_t result;
-    unsigned int gpuTemp = 0, vramTemp = 0, hotSpotTemp = 0, maxTemp;
-
-    // Get GPU core temperature
-    result = nvmlDeviceGetTemperature(device, NVML_TEMPERATURE_GPU, &gpuTemp);
-    if (result != NVML_SUCCESS) {
-        std::cerr << "Failed to get GPU core temperature: " << nvmlErrorString(result) << std::endl;
-        gpuTemp = 0; // Ignore GPU core temperature if reading fails
-    }
-
-    // TODO: Implement logic to read VRAM temperature using your method from gddr6.c
-    // vramTemp = ...;
-
-    hotSpotTemp = readHotSpotTemperature(device);
-
-    // Determine the highest temperature
-    maxTemp = std::max({gpuTemp, vramTemp, hotSpotTemp});
-
-    std::cout << "GPU " << device << " GPU Core Temperature: " << gpuTemp << "C "
-          << "VRAM Temperature: " << vramTemp << "C "
-          << "Hot Spot Temperature: " << hotSpotTemp << "C" << std::endl;
-
-
-    return maxTemp;
-}
-
-// Function to read Hot Spot temperature
-unsigned int readHotSpotTemperature(nvmlDevice_t device) {
-    unsigned int hotSpotTemp = 0;
-    nvmlReturn_t result;
-    nvmlPciInfo_t pciInfo; // Use nvmlPciInfo_t
-
-
-    // Obtain PCI Bus ID of the device
-    result = nvmlDeviceGetPciInfo(device, &pciInfo); // Pass pciInfo directly
-    if (result != NVML_SUCCESS) {
-        std::cerr << "Failed to get PCI Info: " << nvmlErrorString(result) << std::endl;
-        return 0; // Return 0 if unable to get PCI Bus ID
-    }
-
-    // Now pciInfo contains the PCI information, including the bus ID
-    std::string busId(pciInfo.busId); // Convert busId to string for use in file path
-
-    // Correct the file path for memory-mapped I/O using pciInfo.busId
-    std::string path = "/sys/bus/pci/devices/" + busId + "/resource0";
-
-    // Open file descriptor for memory-mapped I/O
-    int fd = open(path.c_str(), O_RDONLY);
-    if (fd < 0) {
-        std::cerr << "Failed to open " << path << " for reading Hot Spot temperature." << std::endl;
-        return 0;
-    }
-
-    // Memory-map the BAR0 region
-    void* mapBase = mmap(nullptr, PAGE_SIZE, PROT_READ, MAP_SHARED, fd, 0);
-    if (mapBase == MAP_FAILED) {
-        std::cerr << "Memory mapping failed." << std::endl;
-        close(fd);
-        return 0;
-    }
-
-    // Calculate the address and read the Hot Spot temperature
-    void* regAddr = reinterpret_cast<void*>(reinterpret_cast<char*>(mapBase) + HOTSPOT_REGISTER_OFFSET);
-    uint32_t regValue = *reinterpret_cast<uint32_t*>(regAddr);
-    hotSpotTemp = (regValue >> 8) & 0xff; // Assuming the register format is similar
-
-    // Cleanup
-    munmap(mapBase, PAGE_SIZE);
-    close(fd);
-
-    return hotSpotTemp;
 }
